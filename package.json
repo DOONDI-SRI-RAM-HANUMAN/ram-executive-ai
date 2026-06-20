@@ -1,0 +1,12 @@
+{
+  "name": "ram-executive-ai",
+  "version": "1.0.0",
+  "private": true,
+  "description": "RAM Executive AI — luxury AI business consultant for RAM AI Web Solutions, with a secure serverless OpenAI backend.",
+  "scripts": {
+    "dev": "vercel dev"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
