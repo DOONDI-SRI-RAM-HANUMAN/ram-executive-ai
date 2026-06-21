@@ -82,6 +82,12 @@ body{
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 #particles{position:fixed; inset:0; z-index:1; pointer-events:none;}
+#mouse-glow{
+  position:fixed; inset:0; z-index:1; pointer-events:none;
+  background:radial-gradient(420px 420px at var(--mx,50%) var(--my,30%), rgba(201,164,73,0.07), transparent 70%);
+  transition:background-position .05s linear;
+}
+@media (max-width:880px){ #mouse-glow{ display:none; } }
 
 /* =========================================================
    APP SHELL
@@ -346,6 +352,265 @@ body{
 .toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
 
 /* =========================================================
+   QUICK ACTIONS (welcome + persistent strip)
+   ========================================================= */
+.quick-actions{display:flex; flex-wrap:wrap; gap:9px; justify-content:center; max-width:640px; margin:0 0 22px;}
+.qa-btn{
+  display:flex; align-items:center; gap:8px; padding:10px 15px; border-radius:999px;
+  border:1px solid var(--hairline-strong); background:rgba(201,164,73,0.06); color:var(--ink);
+  font-size:12.8px; font-weight:600; cursor:pointer; white-space:nowrap;
+  transition:background .2s, transform .15s, border-color .2s, box-shadow .2s;
+}
+.qa-btn:hover{background:rgba(201,164,73,0.14); border-color:var(--gold); transform:translateY(-1px); box-shadow:0 8px 22px rgba(201,164,73,0.14);}
+.qa-btn .em{font-size:14px; line-height:1;}
+.quick-actions-label{font-size:10.5px; letter-spacing:0.16em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:12px;}
+
+/* =========================================================
+   FLOATING WHATSAPP BUTTON
+   ========================================================= */
+.wa-float{
+  position:fixed; right:24px; bottom:24px; z-index:40;
+  width:54px; height:54px; border-radius:50%; border:1px solid rgba(127,174,142,0.5);
+  background:linear-gradient(135deg,#3fae62,#1f7a42); color:#fff; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow:0 10px 30px rgba(31,122,66,0.4), 0 0 0 0 rgba(63,174,98,0.6);
+  animation:waPulse 2.6s ease-out infinite;
+  transition:transform .2s;
+}
+.wa-float:hover{transform:scale(1.08);}
+.wa-float svg{width:26px; height:26px;}
+@keyframes waPulse{
+  0%{box-shadow:0 10px 30px rgba(31,122,66,0.4), 0 0 0 0 rgba(63,174,98,0.45);}
+  70%{box-shadow:0 10px 30px rgba(31,122,66,0.4), 0 0 0 14px rgba(63,174,98,0);}
+  100%{box-shadow:0 10px 30px rgba(31,122,66,0.4), 0 0 0 0 rgba(63,174,98,0);}
+}
+.wa-tooltip{
+  position:fixed; right:86px; bottom:38px; z-index:40;
+  background:rgba(14,13,11,0.95); border:1px solid var(--hairline-strong); color:var(--ink);
+  padding:8px 13px; border-radius:10px; font-size:12.5px; white-space:nowrap;
+  opacity:0; transform:translateX(6px); pointer-events:none; transition:opacity .2s, transform .2s;
+}
+.wa-float:hover + .wa-tooltip, .wa-tooltip.show{opacity:1; transform:translateX(0);}
+@media (max-width: 880px){
+  .wa-float{right:16px; bottom:88px; width:48px; height:48px;}
+  .wa-float svg{width:22px; height:22px;}
+  .wa-tooltip{display:none;}
+}
+
+/* =========================================================
+   PANEL SYSTEM (Portfolio / Pricing / Reviews / Admin)
+   ========================================================= */
+.panel-veil{
+  position:fixed; inset:0; z-index:45; background:rgba(4,4,5,0.72);
+  display:flex; align-items:flex-start; justify-content:center;
+  opacity:0; pointer-events:none; transition:opacity .28s var(--ease);
+  padding:5vh 18px 4vh; overflow-y:auto;
+}
+.panel-veil.show{opacity:1; pointer-events:auto;}
+.panel-card{
+  width:100%; max-width:960px; background:linear-gradient(180deg, rgba(16,15,13,0.98), rgba(9,9,8,0.99));
+  border:1px solid var(--hairline-strong); border-radius:var(--radius-lg);
+  box-shadow:0 40px 100px rgba(0,0,0,0.55);
+  transform:translateY(16px) scale(0.985); transition:transform .3s var(--ease);
+  display:flex; flex-direction:column; max-height:90vh;
+}
+.panel-veil.show .panel-card{transform:translateY(0) scale(1);}
+.panel-head{
+  display:flex; align-items:center; gap:12px; padding:20px 24px;
+  border-bottom:1px solid var(--hairline); flex:0 0 auto;
+}
+.panel-head h2{font-family:var(--font-display); font-size:23px; font-weight:600; margin:0; color:var(--ink);}
+.panel-head .sub{font-size:12px; color:var(--ink-faint); margin-top:2px;}
+.panel-close{
+  margin-left:auto; width:32px; height:32px; border-radius:50%; border:1px solid var(--hairline);
+  background:transparent; color:var(--ink-dim); cursor:pointer; display:flex; align-items:center; justify-content:center;
+  transition:background .2s, color .2s;
+}
+.panel-close:hover{background:rgba(255,255,255,0.06); color:var(--gold-bright);}
+.panel-close svg{width:15px; height:15px;}
+.panel-body{flex:1; overflow-y:auto; padding:24px;}
+.panel-tabs{display:flex; gap:6px; padding:0 24px; border-bottom:1px solid var(--hairline); flex:0 0 auto;}
+.panel-tab{
+  padding:12px 6px; margin-bottom:-1px; border:none; background:transparent; color:var(--ink-faint);
+  font-size:12.8px; font-weight:600; letter-spacing:0.02em; cursor:pointer; border-bottom:2px solid transparent;
+  transition:color .2s, border-color .2s;
+}
+.panel-tab.active{color:var(--gold-bright); border-color:var(--gold);}
+
+/* ---- Portfolio cards ---- */
+.portfolio-grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(250px, 1fr)); gap:16px;}
+.pf-card{
+  border:1px solid var(--hairline); border-radius:var(--radius-md); overflow:hidden;
+  background:rgba(255,255,255,0.018); transition:border-color .25s, transform .2s, box-shadow .25s;
+}
+.pf-card:hover{border-color:var(--hairline-strong); transform:translateY(-3px); box-shadow:0 16px 36px rgba(0,0,0,0.4);}
+.pf-cover{
+  height:118px; display:flex; align-items:center; justify-content:center; position:relative;
+  background:linear-gradient(135deg, rgba(201,164,73,0.22), rgba(20,18,14,0.9));
+}
+.pf-cover svg{width:44px; height:44px; color:var(--gold-bright); opacity:0.85;}
+.pf-cover .cat{
+  position:absolute; top:10px; left:10px; font-size:10px; letter-spacing:0.1em; text-transform:uppercase;
+  color:var(--gold-bright); background:rgba(8,8,8,0.55); border:1px solid var(--hairline-strong); padding:3px 8px; border-radius:999px;
+}
+.pf-body{padding:15px 16px 17px;}
+.pf-body h4{margin:0 0 5px; font-family:var(--font-display); font-size:17px; color:var(--ink); font-weight:600;}
+.pf-body p{margin:0 0 10px; font-size:12.5px; color:var(--ink-dim); line-height:1.55;}
+.pf-feat{display:flex; flex-wrap:wrap; gap:5px; margin-bottom:13px;}
+.pf-feat span{font-size:10.8px; color:var(--ink-faint); background:rgba(255,255,255,0.04); border:1px solid var(--hairline); padding:3px 8px; border-radius:999px;}
+.pf-actions{display:flex; gap:8px;}
+.pf-actions button{
+  flex:1; padding:8px 10px; border-radius:8px; font-size:11.8px; font-weight:600; cursor:pointer; border:1px solid var(--hairline-strong);
+  background:transparent; color:var(--ink-dim); transition:background .2s, color .2s;
+}
+.pf-actions button.primary{background:linear-gradient(135deg, var(--gold-bright), var(--gold-deep)); color:var(--gold-ink); border:none;}
+.pf-actions button:hover{background:rgba(201,164,73,0.14); color:var(--gold-bright);}
+.pf-actions button.primary:hover{filter:brightness(1.06); color:var(--gold-ink);}
+
+/* ---- Pricing cards ---- */
+.pricing-grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(210px, 1fr)); gap:16px;}
+.price-card{
+  position:relative; border:1px solid var(--hairline); border-radius:var(--radius-md); padding:22px 18px;
+  background:rgba(255,255,255,0.018); transition:border-color .25s, transform .2s;
+}
+.price-card:hover{transform:translateY(-3px); border-color:var(--hairline-strong);}
+.price-card.popular{border-color:var(--gold); background:linear-gradient(180deg, rgba(201,164,73,0.09), rgba(255,255,255,0.018));}
+.price-badge{
+  position:absolute; top:-11px; right:18px; background:linear-gradient(135deg,var(--gold-bright),var(--gold-deep));
+  color:var(--gold-ink); font-size:10.5px; font-weight:700; letter-spacing:0.05em; padding:4px 10px; border-radius:999px;
+  text-transform:uppercase;
+}
+.price-card h4{margin:0 0 4px; font-family:var(--font-display); font-size:19px; color:var(--ink);}
+.price-card .price-amt{font-family:var(--font-display); font-size:30px; color:var(--gold-bright); margin:6px 0 2px;}
+.price-amt small{font-size:12px; color:var(--ink-faint); font-family:var(--font-body);}
+.price-card .price-tag{font-size:11.5px; color:var(--ink-faint); margin-bottom:16px;}
+.price-feats{list-style:none; margin:0 0 18px; padding:0; display:flex; flex-direction:column; gap:9px;}
+.price-feats li{display:flex; gap:8px; font-size:12.6px; color:var(--ink-dim); line-height:1.4;}
+.price-feats li svg{width:14px; height:14px; flex:0 0 auto; color:var(--gold); margin-top:1px;}
+.price-cta{
+  width:100%; padding:10px; border-radius:9px; font-size:12.8px; font-weight:700; cursor:pointer;
+  background:transparent; border:1px solid var(--hairline-strong); color:var(--ink);
+  transition:background .2s, color .2s;
+}
+.price-card.popular .price-cta{background:linear-gradient(135deg, var(--gold-bright), var(--gold-deep)); color:var(--gold-ink); border:none;}
+.price-cta:hover{background:rgba(201,164,73,0.16); color:var(--gold-bright);}
+
+/* ---- Google Review flow ---- */
+.review-flow{display:flex; align-items:center; justify-content:space-between; gap:0; margin:10px 0 28px; flex-wrap:wrap;}
+.rf-step{
+  flex:1; min-width:120px; display:flex; flex-direction:column; align-items:center; text-align:center;
+  padding:14px 8px; position:relative; opacity:0.42; transition:opacity .4s, transform .4s;
+}
+.rf-step.active{opacity:1; transform:translateY(-3px);}
+.rf-step .ico{
+  width:46px; height:46px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+  background:rgba(201,164,73,0.1); border:1.5px solid var(--hairline-strong); color:var(--gold-bright); margin-bottom:9px;
+  transition:background .4s, box-shadow .4s;
+}
+.rf-step.active .ico{background:rgba(201,164,73,0.22); box-shadow:0 0 22px rgba(201,164,73,0.3);}
+.rf-step .ico svg{width:20px; height:20px;}
+.rf-step .lbl{font-size:12px; font-weight:600; color:var(--ink); max-width:120px; line-height:1.35;}
+.rf-arrow{color:var(--hairline-strong); flex:0 0 auto; width:20px; height:20px; align-self:center;}
+.review-controls{display:flex; gap:10px; justify-content:center; margin-bottom:6px;}
+.review-stars{display:flex; gap:3px; justify-content:center; margin:18px 0;}
+.review-stars svg{width:26px; height:26px; color:var(--ink-faint); transition:color .25s, transform .25s;}
+.review-stars svg.lit{color:var(--gold-bright); transform:scale(1.08);}
+.review-note{text-align:center; color:var(--ink-dim); font-size:13px; max-width:480px; margin:0 auto 6px; line-height:1.6;}
+
+/* ---- Admin: stat cards / charts ---- */
+.admin-stats{display:grid; grid-template-columns:repeat(auto-fit, minmax(140px,1fr)); gap:12px; margin-bottom:20px;}
+.stat-card{border:1px solid var(--hairline); border-radius:var(--radius-md); padding:14px 16px; background:rgba(255,255,255,0.018);}
+.stat-card .num{font-family:var(--font-display); font-size:27px; color:var(--gold-bright); line-height:1;}
+.stat-card .lbl{font-size:11px; color:var(--ink-faint); margin-top:5px; letter-spacing:0.03em;}
+.chart-row{display:grid; grid-template-columns:1.4fr 1fr; gap:16px; margin-bottom:22px;}
+@media (max-width:700px){.chart-row{grid-template-columns:1fr;}}
+.chart-box{border:1px solid var(--hairline); border-radius:var(--radius-md); padding:14px 16px; background:rgba(255,255,255,0.018);}
+.chart-box h5{margin:0 0 10px; font-size:11.5px; letter-spacing:0.1em; text-transform:uppercase; color:var(--ink-faint); font-weight:600;}
+.chart-box canvas{width:100%; display:block;}
+
+/* ---- Admin: leads table ---- */
+.admin-toolbar{display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px; align-items:center;}
+.admin-toolbar input[type="text"]{
+  flex:1; min-width:160px; padding:9px 12px; border-radius:9px; background:rgba(255,255,255,0.03);
+  border:1px solid var(--hairline); color:var(--ink); font-size:13px;
+}
+.admin-toolbar select{
+  padding:9px 10px; border-radius:9px; background:rgba(255,255,255,0.03); border:1px solid var(--hairline);
+  color:var(--ink); font-size:12.5px;
+}
+.admin-toolbar button{
+  padding:9px 14px; border-radius:9px; font-size:12.5px; font-weight:700; cursor:pointer;
+  background:linear-gradient(135deg,var(--gold-bright),var(--gold-deep)); color:var(--gold-ink); border:none;
+}
+.admin-toolbar button.ghost{background:transparent; color:var(--ink-dim); border:1px solid var(--hairline);}
+.leads-table-wrap{overflow-x:auto; border:1px solid var(--hairline); border-radius:var(--radius-md);}
+table.leads-table{width:100%; border-collapse:collapse; font-size:12.5px; min-width:920px;}
+table.leads-table th{
+  text-align:left; padding:10px 12px; background:rgba(201,164,73,0.07); color:var(--gold-bright);
+  font-size:10.8px; letter-spacing:0.08em; text-transform:uppercase; white-space:nowrap; border-bottom:1px solid var(--hairline);
+}
+table.leads-table td{padding:10px 12px; border-bottom:1px solid var(--hairline); color:var(--ink-dim); vertical-align:middle;}
+table.leads-table tr:last-child td{border-bottom:none;}
+table.leads-table tr:hover td{background:rgba(255,255,255,0.02);}
+.leads-empty{padding:40px 10px; text-align:center; color:var(--ink-faint); font-size:13px;}
+.score-stars{display:flex; gap:1px;}
+.score-stars svg{width:12px; height:12px; color:var(--ink-faint);}
+.score-stars svg.lit{color:var(--gold-bright);}
+.status-pill{
+  font-size:11px; padding:3px 9px; border-radius:999px; border:1px solid var(--hairline-strong); cursor:pointer;
+  background:rgba(255,255,255,0.03); color:var(--ink-dim); font-family:var(--font-body);
+}
+.status-pill[data-status="new"]{color:#9bb6e0; border-color:rgba(155,182,224,0.4);}
+.status-pill[data-status="contacted"]{color:var(--gold-bright); border-color:var(--hairline-strong);}
+.status-pill[data-status="qualified"]{color:#e0b85c; border-color:rgba(224,184,92,0.4);}
+.status-pill[data-status="won"]{color:var(--ok); border-color:rgba(127,174,142,0.4);}
+.status-pill[data-status="lost"]{color:var(--danger); border-color:rgba(196,103,91,0.4);}
+.notes-input{
+  width:140px; background:transparent; border:1px solid transparent; color:var(--ink-dim); font-size:12px;
+  font-family:var(--font-body); padding:4px 6px; border-radius:6px;
+}
+.notes-input:focus{border-color:var(--hairline-strong); background:rgba(255,255,255,0.03);}
+.row-del-btn{width:26px; height:26px; border-radius:7px; border:1px solid var(--hairline); background:transparent; color:var(--ink-faint); cursor:pointer; display:flex; align-items:center; justify-content:center;}
+.row-del-btn:hover{background:rgba(196,103,91,0.12); color:var(--danger); border-color:rgba(196,103,91,0.4);}
+.row-del-btn svg{width:13px; height:13px;}
+
+/* ---- Lead capture card (inline in chat) ---- */
+.lead-card{
+  border:1px solid var(--hairline-strong); border-radius:var(--radius-md); padding:18px;
+  background:linear-gradient(180deg, rgba(201,164,73,0.07), rgba(255,255,255,0.012)); margin-top:4px;
+}
+.lead-card h4{margin:0 0 4px; font-family:var(--font-display); font-size:17px; color:var(--gold-bright);}
+.lead-card p{margin:0 0 14px; font-size:12.5px; color:var(--ink-dim); line-height:1.5;}
+.lead-fields{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px;}
+.lead-fields .full{grid-column:1 / -1;}
+.lead-fields label{display:block; font-size:10.8px; letter-spacing:0.04em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:5px;}
+.lead-fields input, .lead-fields select{
+  width:100%; padding:9px 10px; border-radius:8px; background:rgba(0,0,0,0.28); border:1px solid var(--hairline);
+  color:var(--ink); font-size:13px; font-family:var(--font-body);
+}
+.lead-fields input:focus, .lead-fields select:focus{border-color:var(--hairline-strong);}
+.lead-submit{
+  width:100%; padding:11px; border-radius:9px; border:none; cursor:pointer; font-size:13.5px; font-weight:700;
+  background:linear-gradient(135deg, var(--gold-bright), var(--gold-deep)); color:var(--gold-ink);
+  transition:filter .2s;
+}
+.lead-submit:hover{filter:brightness(1.07);}
+.lead-card.submitted{text-align:center; padding:24px 18px;}
+.lead-card.submitted .check{width:40px; height:40px; margin:0 auto 12px; color:var(--ok);}
+.lead-skip{display:block; text-align:center; margin-top:10px; font-size:11.5px; color:var(--ink-faint); background:none; border:none; cursor:pointer;}
+.lead-skip:hover{color:var(--ink-dim);}
+
+/* ---- Human handoff nudge ---- */
+.handoff-row{display:flex; flex-wrap:wrap; gap:8px; margin-top:10px;}
+.handoff-row button{
+  display:flex; align-items:center; gap:7px; padding:9px 13px; border-radius:10px;
+  border:1px solid var(--hairline-strong); background:rgba(201,164,73,0.06); color:var(--ink);
+  font-size:12px; font-weight:600; cursor:pointer; transition:background .2s, transform .15s;
+}
+.handoff-row button:hover{background:rgba(201,164,73,0.16); transform:translateY(-1px);}
+.handoff-row button svg{width:14px; height:14px; color:var(--gold-bright);}
+
+/* =========================================================
    RESPONSIVE
    ========================================================= */
 @media (max-width: 880px){
@@ -368,6 +633,7 @@ body{
 
 <div id="bg-mesh"></div>
 <div id="bg-grain"></div>
+<div id="mouse-glow"></div>
 <canvas id="particles"></canvas>
 
 <div class="app">
@@ -426,6 +692,18 @@ body{
           <svg class="seal-lg" viewBox="0 0 64 64" id="sealWelcome"></svg>
           <h1>How can we elevate <em>your</em> business?</h1>
           <p>I'm RAM Executive AI — your dedicated consultant on website strategy, branding, AI automation and growth. Tell me about your business, and I'll help you find the right path forward.</p>
+
+          <div class="quick-actions-label">Explore</div>
+          <div class="quick-actions" id="quickActions">
+            <button class="qa-btn" data-qa="website"><span class="em">🌐</span> Website</button>
+            <button class="qa-btn" data-qa="chatbot"><span class="em">🤖</span> AI Chatbot</button>
+            <button class="qa-btn" data-qa="reviews"><span class="em">⭐</span> Google Reviews</button>
+            <button class="qa-btn" data-qa="crm"><span class="em">📊</span> CRM</button>
+            <button class="qa-btn" data-qa="pricing"><span class="em">💰</span> Pricing</button>
+            <button class="qa-btn" data-qa="portfolio"><span class="em">📂</span> Portfolio</button>
+            <button class="qa-btn" data-qa="book"><span class="em">📞</span> Book Consultation</button>
+          </div>
+
           <div class="suggestions" id="suggestions">
             <button class="chip" data-prompt="I need a website but I'm not sure where to start.">I need a website but I'm not sure where to start</button>
             <button class="chip" data-prompt="What's the real difference between relying on social media versus owning a website?">Website vs. relying on social media — what's the difference?</button>
@@ -464,11 +742,70 @@ body{
   </div>
 </div>
 
+<button class="wa-float" id="waFloat" aria-label="Chat on WhatsApp">
+  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.5 14.4c-.3-.1-1.7-.8-2-1-.3-.1-.5-.1-.7.1-.2.3-.7 1-.9 1.1-.2.1-.4.2-.6 0-1.7-.8-2.8-1.5-3.9-3.4-.1-.3 0-.4.1-.6l.5-.6c.1-.2.1-.3 0-.6-.1-.2-.6-1.5-.8-2-.2-.4-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.4-.2.3-.9 1-.9 2.3 0 1.3 1 2.6 1.1 2.8.1.2 1.6 2.6 4 3.6 2 .8 2.4.6 2.8.6.5-.1 1.6-.7 1.8-1.3.2-.6.2-1.2.2-1.3-.1-.1-.2-.2-.4-.3z"/><path d="M12 2C6.5 2 2 6.5 2 12c0 1.9.5 3.7 1.5 5.2L2 22l4.9-1.4C8.4 21.5 10.2 22 12 22c5.5 0 10-4.5 10-10S17.5 2 12 2zm0 18.2c-1.6 0-3.1-.4-4.5-1.2l-.3-.2-3.3 1 1-3.2-.2-.3C3.9 15 3.4 13.5 3.4 12 3.4 7.3 7.3 3.4 12 3.4s8.6 3.9 8.6 8.6-3.9 8.2-8.6 8.2z"/></svg>
+</button>
+<div class="wa-tooltip" id="waTooltip">Talk to a human on WhatsApp</div>
+
+<div class="panel-veil" id="panelVeil">
+  <div class="panel-card" id="panelCard">
+    <div class="panel-head">
+      <div>
+        <h2 id="panelTitle">Panel</h2>
+        <div class="sub" id="panelSub"></div>
+      </div>
+      <button class="panel-close" id="panelCloseBtn" aria-label="Close panel">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="panel-tabs" id="panelTabs" style="display:none;"></div>
+    <div class="panel-body" id="panelBody"></div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
 (function(){
 "use strict";
+
+/* =========================================================
+   CONFIG — single source of truth for the whole application.
+   Edit these values to rebrand or update offerings; every
+   panel, link and reply pulls from here.
+   ========================================================= */
+var CONFIG = {
+  businessName: "RAM AI WEB SOLUTIONS",
+  aiName: "RAM Executive AI",
+  tagline: "Premium Websites • AI Automation • Business Growth",
+  phone: "+91 90000 00000",
+  email: "hello@ramaiwebsolutions.com",
+  whatsapp: "919000000000",
+  address: "Hyderabad, Telangana, India",
+  social: {
+    instagram: "https://instagram.com/ramaiwebsolutions",
+    linkedin: "https://linkedin.com/company/ramaiwebsolutions"
+  },
+  services: ["Website Design","Landing Pages","AI Chatbots","Business Automation","Google Review Automation","CRM & Lead Capture","SEO & Branding"],
+  pricing: [
+    { id:"starter", name:"Starter", price:"₹14,999", tag:"One-time · 5 pages", popular:false,
+      features:["Responsive 5-page website","Mobile-first design","Basic SEO setup","WhatsApp button","2 rounds of revisions"] },
+    { id:"professional", name:"Professional", price:"₹29,999", tag:"One-time · up to 10 pages", popular:true,
+      features:["Everything in Starter","AI chatbot (this experience)","Google Reviews automation","Lead capture & CRM","Priority support 30 days"] },
+    { id:"premium", name:"Premium", price:"₹54,999", tag:"One-time · full platform", popular:false,
+      features:["Everything in Professional","Custom animations & branding","Booking / appointment system","Advanced analytics dashboard","60 days support"] },
+    { id:"enterprise", name:"Enterprise", price:"Custom", tag:"Tailored engagement", popular:false,
+      features:["Multi-location / multi-brand","Custom AI automation","Dedicated account manager","SLA-backed support","Ongoing growth retainer"] }
+  ],
+  portfolio: [
+    { cat:"Restaurant", title:"The Saffron Table", desc:"QR menu, WhatsApp ordering and a reservations flow built for footfall.", feats:["QR Menu","WhatsApp Orders","Reservations"] },
+    { cat:"Cafe", title:"Brew & Co.", desc:"A warm, story-led site that turns regulars into reviewers.", feats:["Gallery","Reviews","Loyalty"] },
+    { cat:"Salon", title:"Lumière Studio", desc:"Appointment booking with an AI receptionist handling FAQs 24/7.", feats:["Booking","AI Receptionist","Instagram Feed"] },
+    { cat:"Medical", title:"Wellpath Clinic", desc:"Doctor profiles, appointment booking and an emergency contact bar.", feats:["Doctor Profiles","Booking","Emergency CTA"] },
+    { cat:"Jewellery", title:"Anaya Jewels", desc:"Luxury catalogue presentation with appointment-only viewings.", feats:["Lookbook","Lead Capture","SEO"] },
+    { cat:"Startup", title:"Northstar AI", desc:"Investor-ready landing page with a built-in lead CRM and analytics.", feats:["Investor Page","CRM","Analytics"] }
+  ]
+};
 
 /* =========================================================
    SEAL / MONOGRAM SVG
@@ -848,8 +1185,8 @@ var KNOWLEDGE = [
     reply: "Branding is the consistent promise your business makes before a single word is read — color, typography, tone, and imagery all working together so a visitor instantly understands who you are and whether they trust you. Strong branding isn't decoration; it's the shortest path to credibility.\n\nIf you don't have brand assets yet, we typically start with a short discovery conversation about your audience and positioning, then build a simple, flexible identity system — logo, palette, type — that your website and marketing can both lean on."
   },
   {
-    test: /lead(s)? generation|convert|conversion/i,
-    reply: "Conversion comes down to removing friction between *interest* and *action*. That means a clear value proposition above the fold, obvious next steps (one primary call-to-action per page, not five competing ones), fast load speed, and trust signals like testimonials or credentials placed where doubt naturally appears.\n\nAn AI consultant like this one adds another layer — engaging visitors in real time instead of letting them leave with unanswered questions."
+    test: /\bcrm\b|lead(s)? generation|convert|conversion/i,
+    reply: "A simple CRM is one of the highest-ROI additions to a website because it stops leads from disappearing into inboxes or DM threads. What it typically does:\n- **Captures** name, contact, industry and budget right inside the conversation\n- **Scores** each lead automatically so you know who to call first\n- **Tracks status** — new, contacted, qualified, won — so nothing falls through\n- **Exports** to CSV or syncs with tools you already use\n\nThis chat is actually running a lightweight version of exactly that behind the scenes. Want to talk about adding it to your own site?"
   },
   {
     test: /contact|consult|talk to (a|someone)|human|call|demo|get started|book/i,
@@ -862,8 +1199,224 @@ var KNOWLEDGE = [
   {
     test: /thank/i,
     reply: "You're very welcome. If anything else comes up as you think this through — strategy, design, automation, or just sanity-checking a decision — I'm here."
+  },
+  /* ---- Industry-specific consulting (auto-recommendation) ---- */
+  {
+    test: /restaurant|dine|dining|food (truck|business)/i,
+    reply: "Restaurants convert best with friction removed at the exact moment of hunger. For a restaurant, I'd typically recommend:\n- **QR Menu** — instant access, no app download, easy to update seasonally\n- **WhatsApp Ordering** — orders land where your customers already are\n- **Google Reviews automation** — turns happy diners into 5-star proof\n- **Reservation system** — stops phone-tag during peak hours\n\nWant me to show you a live example from our portfolio, or talk pricing for this kind of build?"
+  },
+  {
+    test: /salon|spa|barber|beauty parlour|beauty salon/i,
+    reply: "For a salon or spa, the highest-leverage pieces are usually:\n- **Appointment booking** — fewer no-shows, fuller chairs\n- **AI receptionist** (like this chat) — answers pricing/hours instantly, even at midnight\n- **Google Reviews automation** — beauty businesses live and die by reviews\n- **Portfolio gallery** — your work is the best sales page you have\n- **Instagram integration** — pulls your existing content onto the site automatically\n\nWould you like to see a salon example, or talk through what this would cost?"
+  },
+  {
+    test: /clinic|hospital|doctor|dental|medical practice|healthcare/i,
+    reply: "Medical and clinic websites carry a higher trust bar, so the priorities shift slightly:\n- **Appointment booking** integrated with your calendar\n- **Doctor profiles** — credentials build immediate confidence\n- **Clear location & emergency contact** — visible without scrolling\n- **AI assistant** for common questions (hours, insurance, services)\n- **SEO** — patients searching \"near me\" need to find you first\n\nI can show a relevant example or outline scope if you'd like."
+  },
+  {
+    test: /startup|saas|investor|founder|pitch/i,
+    reply: "For a startup, the website usually has to do double duty — convert customers *and* impress investors. I'd typically recommend:\n- **A sharp landing page** built around one clear value proposition\n- **Lead capture** wired straight into a CRM, not a black hole\n- **Analytics** so you can see what's actually working\n- **An investor page** with traction, team and the pitch deck link\n- **AI chatbot** to qualify inbound interest while you're heads-down building\n\nHappy to show a startup example or talk through a build timeline."
+  },
+  {
+    test: /\bcafe\b|coffee shop/i,
+    reply: "Cafes do well with a website that feels as warm as the space itself:\n- **A story-led design** — your atmosphere, in pixels\n- **Gallery** of the space and menu highlights\n- **Google Reviews automation** to keep your rating climbing\n- **Loyalty / repeat-visit prompts** for regulars\n\nWant to see an example, or talk through what this would cost for your cafe?"
+  },
+  {
+    test: /jewel|jewellery|jewelry/i,
+    reply: "Jewellery brands sell on trust and presentation, so I'd lean toward:\n- **A luxury lookbook-style catalogue** rather than a generic product grid\n- **Lead capture for appointment-only viewings**, which fits high-value pieces\n- **SEO** for the specific pieces and collections people search for\n\nWant to see a relevant example from our portfolio?"
+  },
+  /* ---- Objection handling ---- */
+  {
+    test: /too expensive|can.?t afford|out of budget|costly|pricey/i,
+    reply: "Totally fair concern, and I'd rather be straight with you than oversell. Think of it less as a cost and more as **what it replaces** — a basic site with automation usually pays for itself by recovering just a handful of leads that would otherwise slip through DMs or missed calls.\n\nWe also structure tiers (Starter → Professional → Premium) so you're never paying for more than your stage needs. If budget is the main blocker right now, tell me roughly what range feels comfortable and I'll tell you honestly what's realistic at that level."
+  },
+  {
+    test: /need (more )?time|not (ready|now)|maybe later|think about it/i,
+    reply: "Completely understandable — this shouldn't be rushed. One thing worth knowing: starting the conversation now doesn't commit you to anything immediately, it just means when you *are* ready, the plan, scope and budget are already clear instead of starting from zero. Want me to put together a simple outline you can revisit whenever the timing's right?"
+  },
+  {
+    test: /already have (a )?website/i,
+    reply: "Good — that's actually the easiest starting point, since we're improving rather than building from scratch. A few quick questions: what's it currently failing to do — is it slow, outdated, not generating leads, or just hard for you to update yourself? Sites we audit usually have 2-3 fixable issues that account for most of the lost conversions, so even a focused refresh can move the needle quickly."
+  },
+  {
+    test: /only (need|want) instagram|instagram is enough|just use instagram/i,
+    reply: "Instagram is genuinely great for visibility and relationship-building — I wouldn't tell you to drop it. The risk is relying on it *alone*: the algorithm decides who sees your posts, your profile can be restricted or lost, and customers searching Google won't find an Instagram handle as easily as a real website. The strongest setup uses Instagram to attract attention and a website to convert and keep it permanently, on infrastructure you actually own."
+  },
+  {
+    test: /only (need|want) whatsapp|whatsapp is enough|just use whatsapp/i,
+    reply: "WhatsApp is excellent for close, conversational selling — but it doesn't show up in Google searches, doesn't build long-term SEO value, and every new visitor has to already have your number. A simple website with a WhatsApp button gives you the best of both: discoverability *and* the conversational close you already do well."
+  },
+  {
+    test: /only (need|want) google (business|my business)|google business (profile )?is enough/i,
+    reply: "A Google Business Profile is a smart first step and we'd set one up regardless — it's free visibility. But it's limited to what Google allows you to show. A linked website lets you tell your story properly, showcase your full portfolio or menu, and capture leads directly instead of just a phone number and map pin. The two work best together, not as a substitute for each other."
   }
 ];
+
+/* =========================================================
+   LEAD ENGINE — extraction, scoring and CRM storage
+   ========================================================= */
+var LEADS_KEY = 'ram_exec_ai_leads_v1';
+var VISITS_KEY = 'ram_exec_ai_visits_v1';
+var DAILY_KEY = 'ram_exec_ai_daily_v1';
+var SESSION_FLAG = 'ram_exec_ai_session_counted_v1';
+
+var INDUSTRY_PATTERNS = {
+  Restaurant: /restaurant|dine|dining|food truck/i,
+  Cafe: /\bcafe\b|coffee shop/i,
+  Salon: /salon|spa|barber|beauty/i,
+  Medical: /clinic|hospital|doctor|dental|healthcare|medical/i,
+  Startup: /startup|saas|founder|investor/i,
+  Jewellery: /jewel/i,
+  Retail: /retail|shop|store|boutique/i,
+  Other: /.*/
+};
+
+function detectIndustry(text){
+  for(var key in INDUSTRY_PATTERNS){
+    if(key === 'Other') continue;
+    if(INDUSTRY_PATTERNS[key].test(text)) return key;
+  }
+  return null;
+}
+function detectBudgetTier(text){
+  var nums = text.match(/(\d[\d,]{2,})/);
+  if(/lakh|100000|1,00,000/i.test(text)) return 'high';
+  if(nums){
+    var n = parseInt(nums[0].replace(/,/g,''),10);
+    if(n >= 50000) return 'high';
+    if(n >= 20000) return 'mid';
+    if(n > 0) return 'low';
+  }
+  if(/enterprise|premium|custom/i.test(text)) return 'high';
+  return null;
+}
+function detectTimeline(text){
+  if(/urgent(ly)?|asap|immediately|this week/i.test(text)) return 'Urgent';
+  if(/month|few weeks/i.test(text)) return 'This month';
+  if(/no rush|later|few months|next quarter/i.test(text)) return 'Flexible';
+  return null;
+}
+function extractEmail(text){ var m = text.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/); return m ? m[0] : null; }
+function extractPhone(text){ var m = text.match(/(\+?\d[\d\s-]{8,14}\d)/); return m ? m[0].trim() : null; }
+function extractName(text){
+  var m = /(?:my name is|i am|i'm|this is)\s+([A-Z][a-zA-Z]{1,18})/i.exec(text);
+  return m ? m[1] : null;
+}
+function extractBusinessName(text){
+  var m = /(?:business is called|company is called|called|named)\s+([A-Z][\w&'.\- ]{1,32})/i.exec(text);
+  return m ? m[1].trim() : null;
+}
+
+function updateProfileFromText(convo, text){
+  convo.profile = convo.profile || {};
+  var p = convo.profile;
+  var ind = detectIndustry(text); if(ind && !p.industry) p.industry = ind;
+  var bt = detectBudgetTier(text); if(bt && !p.budgetTier) p.budgetTier = bt;
+  var tl = detectTimeline(text); if(tl && !p.timeline) p.timeline = tl;
+  var em = extractEmail(text); if(em && !p.email) p.email = em;
+  var ph = extractPhone(text); if(ph && !p.phone) p.phone = ph;
+  var nm = extractName(text); if(nm && !p.name) p.name = nm;
+  var bn = extractBusinessName(text); if(bn && !p.business) p.business = bn;
+  p.messageCount = (p.messageCount || 0) + 1;
+}
+
+function scoreLead(lead){
+  var score = 1;
+  if(lead.phone || lead.email) score++;
+  if(lead.phone && lead.email) score++;
+  if(lead.industry) score++;
+  if(lead.budgetTier === 'mid') score++;
+  if(lead.budgetTier === 'high') score += 2;
+  if(lead.timeline === 'Urgent') score++;
+  if((lead.messageCount || 0) >= 4) score++;
+  return Math.max(1, Math.min(5, score));
+}
+
+function loadLeads(){ try{ var r = JSON.parse(localStorage.getItem(LEADS_KEY) || '[]'); return Array.isArray(r) ? r : []; }catch(e){ return []; } }
+function saveLeads(list){ try{ localStorage.setItem(LEADS_KEY, JSON.stringify(list)); }catch(e){} }
+
+function saveLead(profile, convoId){
+  var leads = loadLeads();
+  var score = scoreLead(profile);
+  var lead = {
+    id: uid(),
+    convoId: convoId,
+    name: profile.name || 'Unnamed Lead',
+    business: profile.business || '—',
+    phone: profile.phone || '',
+    email: profile.email || '',
+    industry: profile.industry || 'Other',
+    budget: profile.budgetTier || 'Unspecified',
+    timeline: profile.timeline || 'Unspecified',
+    status: 'new',
+    score: score,
+    notes: '',
+    date: Date.now()
+  };
+  leads.unshift(lead);
+  saveLeads(leads);
+  return lead;
+}
+
+/* ---- Analytics tracking ---- */
+function trackVisit(){
+  try{
+    if(!sessionStorage.getItem(SESSION_FLAG)){
+      var v = parseInt(localStorage.getItem(VISITS_KEY) || '0', 10) + 1;
+      localStorage.setItem(VISITS_KEY, String(v));
+      sessionStorage.setItem(SESSION_FLAG, '1');
+    }
+  }catch(e){}
+}
+function todayKey(){ return new Date().toISOString().slice(0,10); }
+function trackMessage(){
+  try{
+    var data = JSON.parse(localStorage.getItem(DAILY_KEY) || '{}');
+    var k = todayKey();
+    data[k] = (data[k] || 0) + 1;
+    localStorage.setItem(DAILY_KEY, JSON.stringify(data));
+  }catch(e){}
+}
+function getDailyMessageSeries(days){
+  var data = {};
+  try{ data = JSON.parse(localStorage.getItem(DAILY_KEY) || '{}'); }catch(e){}
+  var out = [];
+  for(var i = days - 1; i >= 0; i--){
+    var d = new Date();
+    d.setDate(d.getDate() - i);
+    var k = d.toISOString().slice(0,10);
+    out.push({ label: d.toLocaleDateString(undefined,{ weekday:'short' }), value: data[k] || 0 });
+  }
+  return out;
+}
+function getTotalMessages(){
+  var data = {};
+  try{ data = JSON.parse(localStorage.getItem(DAILY_KEY) || '{}'); }catch(e){}
+  var total = 0;
+  for(var k in data) total += data[k];
+  return total;
+}
+function getVisitCount(){ return parseInt(localStorage.getItem(VISITS_KEY) || '0', 10); }
+
+function shouldOfferLeadCapture(convo){
+  var p = convo.profile || {};
+  if(convo.leadCaptured) return false;
+  if(p.email || p.phone) return false;
+  var signals = 0;
+  if(p.industry) signals++;
+  if(p.budgetTier) signals++;
+  if(p.timeline) signals++;
+  return (p.messageCount || 0) >= 3 && signals >= 1;
+}
+
+function shouldOfferHandoff(convo){
+  var p = convo.profile || {};
+  if(convo.handoffOffered) return false;
+  var complex = (p.messageCount || 0) >= 6;
+  var urgent = p.timeline === 'Urgent';
+  var highBudget = p.budgetTier === 'high';
+  return complex || urgent || highBudget;
+}
 
 var FALLBACKS = [
   "That's a great question, and the right answer really depends on your business. Could you tell me a little more — what does your business do, and what's the main outcome you're hoping for (more leads, more credibility, more sales)?",
@@ -871,11 +1424,17 @@ var FALLBACKS = [
   "Let's get specific so I can actually help. What does success look like for you in the next few months, and what's standing in the way right now?"
 ];
 
-function localConsultantReply(userText){
+function localConsultantReply(userText, convo){
+  var reply = null;
   for(var i=0;i<KNOWLEDGE.length;i++){
-    if(KNOWLEDGE[i].test.test(userText)) return KNOWLEDGE[i].reply;
+    if(KNOWLEDGE[i].test.test(userText)){ reply = KNOWLEDGE[i].reply; break; }
   }
-  return FALLBACKS[Math.floor(Math.random() * FALLBACKS.length)];
+  if(!reply) reply = FALLBACKS[Math.floor(Math.random() * FALLBACKS.length)];
+  var p = convo && convo.profile;
+  if(p && p.name && p.messageCount === 1){
+    reply = "Good to meet you, " + p.name + ". " + reply;
+  }
+  return reply;
 }
 
 /* =========================================================
@@ -979,7 +1538,7 @@ function setComposerLocked(locked){
   $composerInput.disabled = locked;
 }
 
-function tryBackendThenFallback(history, userText){
+function tryBackendThenFallback(history, userText, convo){
   var controller = (typeof AbortController !== 'undefined') ? new AbortController() : null;
   var timeout = setTimeout(function(){ if(controller) controller.abort(); }, 25000);
 
@@ -1000,7 +1559,7 @@ function tryBackendThenFallback(history, userText){
     clearTimeout(timeout);
     // Graceful local fallback so the interface remains fully functional
     // without a live OpenAI-connected backend.
-    return localConsultantReply(userText);
+    return localConsultantReply(userText, convo);
   });
 }
 
@@ -1012,6 +1571,8 @@ function handleSend(userText){
   }
   var userMsg = { id: uid(), role: 'user', content: userText, time: Date.now() };
   convo.messages.push(userMsg);
+  updateProfileFromText(convo, userText);
+  trackMessage();
   persist();
 
   $welcome.style.display = 'none';
@@ -1027,7 +1588,7 @@ function handleSend(userText){
 
   var thinkDelay = 480 + Math.random() * 420;
   setTimeout(function(){
-    tryBackendThenFallback(historyPayload, userText).then(function(replyText){
+    tryBackendThenFallback(historyPayload, userText, convo).then(function(replyText){
       hideTyping();
       var bubbleEl = appendStreamingBubble();
       var aiMsg = { id: uid(), role: 'assistant', content: replyText, time: Date.now() };
@@ -1038,6 +1599,11 @@ function handleSend(userText){
         persist();
         setComposerLocked(false);
         $composerInput.focus();
+        if(shouldOfferHandoff(convo)){
+          setTimeout(function(){ appendHandoffOffer(convo); }, 420);
+        } else if(shouldOfferLeadCapture(convo)){
+          setTimeout(function(){ appendLeadCaptureCard(convo); }, 420);
+        }
       });
     });
   }, thinkDelay);
@@ -1062,6 +1628,497 @@ document.getElementById('suggestions').addEventListener('click', function(e){
 
 document.getElementById('bookBtn').addEventListener('click', function(){
   handleSend("I'd like to book a consultation about my project.");
+});
+
+/* =========================================================
+   SHARED ICONS
+   ========================================================= */
+var ICO = {
+  check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>',
+  star: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.27 5.82 21 7 14.14l-5-4.87 6.91-1.01z"/></svg>',
+  monitor: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>',
+  serviceDone: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>',
+  robot: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="9" width="16" height="11" rx="2"/><circle cx="9" cy="14.5" r="1.2" fill="currentColor" stroke="none"/><circle cx="15" cy="14.5" r="1.2" fill="currentColor" stroke="none"/><path d="M12 9V5M9 5h6"/></svg>',
+  smile: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01"/></svg>',
+  trending: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg>',
+  trash: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>'
+};
+
+/* =========================================================
+   LEAD CAPTURE CARD (inline, conversational)
+   ========================================================= */
+function appendLeadCaptureCard(convo){
+  if(convo.leadCaptured) return;
+  var p = convo.profile || {};
+  var wrap = document.createElement('div');
+  wrap.className = 'msg ai';
+  var cardId = 'leadcard_' + uid();
+  wrap.innerHTML =
+    '<div class="avatar">' + avatarSealSmall() + '</div>' +
+    '<div class="col">' +
+      '<div class="who">RAM Executive AI</div>' +
+      '<div class="lead-card" id="' + cardId + '">' +
+        '<h4>Let\'s get this in front of our team</h4>' +
+        '<p>Drop your details and a specialist will follow up about your project — no spam, just a real conversation.</p>' +
+        '<div class="lead-fields">' +
+          '<div><label>Name</label><input type="text" data-f="name" value="' + escapeHtml(p.name || '') + '" placeholder="Your name"></div>' +
+          '<div><label>Business</label><input type="text" data-f="business" value="' + escapeHtml(p.business || '') + '" placeholder="Business name"></div>' +
+          '<div><label>Phone</label><input type="text" data-f="phone" value="' + escapeHtml(p.phone || '') + '" placeholder="Phone number"></div>' +
+          '<div><label>Email</label><input type="email" data-f="email" value="' + escapeHtml(p.email || '') + '" placeholder="Email address"></div>' +
+          '<div class="full"><label>Industry</label>' +
+            '<select data-f="industry">' +
+              '<option value="">Select industry</option>' +
+              ['Restaurant','Cafe','Salon','Medical','Startup','Jewellery','Retail','Other'].map(function(o){
+                return '<option value="' + o + '"' + (p.industry === o ? ' selected' : '') + '>' + o + '</option>';
+              }).join('') +
+            '</select>' +
+          '</div>' +
+        '</div>' +
+        '<button type="button" class="lead-submit">Send my details</button>' +
+        '<button type="button" class="lead-skip">Maybe later</button>' +
+      '</div>' +
+      '<div class="msg-time">' + formatTime(Date.now()) + '</div>' +
+    '</div>';
+  $messages.appendChild(wrap);
+  scrollToBottom(true);
+
+  var card = wrap.querySelector('.lead-card');
+  card.querySelector('.lead-skip').addEventListener('click', function(){
+    convo.leadCaptured = true;
+    persist();
+    card.outerHTML = '<div class="bubble"><p>No problem — I\'m here whenever you\'re ready. Feel free to keep asking me anything in the meantime.</p></div>';
+  });
+  card.querySelector('.lead-submit').addEventListener('click', function(){
+    var data = {};
+    card.querySelectorAll('[data-f]').forEach(function(el){ data[el.getAttribute('data-f')] = el.value.trim(); });
+    if(!data.phone && !data.email){
+      showToast('Please add a phone number or email so we can reach you');
+      return;
+    }
+    var merged = Object.assign({}, p, data);
+    merged.industry = data.industry || p.industry;
+    var lead = saveLead(merged, convo.id);
+    convo.leadCaptured = true;
+    convo.profile = merged;
+    persist();
+    card.className = 'lead-card submitted';
+    card.innerHTML =
+      '<div class="check">' + ICO.check + '</div>' +
+      '<h4>Thank you' + (data.name ? ', ' + escapeHtml(data.name) : '') + '!</h4>' +
+      '<p>Your details are with our team. We typically follow up within one business day. Feel free to keep chatting in the meantime.</p>';
+    showToast('Lead captured — score ' + lead.score + '/5');
+  });
+}
+
+/* =========================================================
+   HUMAN HANDOFF (urgent / high-budget / complex threads)
+   ========================================================= */
+function appendHandoffOffer(convo){
+  convo.handoffOffered = true;
+  persist();
+  var wrap = document.createElement('div');
+  wrap.className = 'msg ai';
+  wrap.innerHTML =
+    '<div class="avatar">' + avatarSealSmall() + '</div>' +
+    '<div class="col">' +
+      '<div class="who">RAM Executive AI</div>' +
+      '<div class="bubble"><p>This sounds like something our team should weigh in on directly. Easiest next step:</p></div>' +
+      '<div class="handoff-row">' +
+        '<button type="button" id="handoffWa">' + ICO.robot.replace('<svg ', '<svg style="color:#3fae62" ') + ' Talk to a human</button>' +
+        '<button type="button" id="handoffBook">' + ICO.star + ' Book a Consultation</button>' +
+        '<button type="button" id="handoffCall">' + ICO.trending + ' Call now</button>' +
+      '</div>' +
+      '<div class="msg-time">' + formatTime(Date.now()) + '</div>' +
+    '</div>';
+  $messages.appendChild(wrap);
+  scrollToBottom(true);
+  wrap.querySelector('#handoffWa').addEventListener('click', function(){
+    var msg = encodeURIComponent('Hello ' + CONFIG.businessName + ', I need a website for my business.');
+    window.open('https://wa.me/' + CONFIG.whatsapp + '?text=' + msg, '_blank', 'noopener');
+  });
+  wrap.querySelector('#handoffBook').addEventListener('click', function(){
+    handleSend("I'd like to book a consultation about my project.");
+  });
+  wrap.querySelector('#handoffCall').addEventListener('click', function(){
+    window.location.href = 'tel:' + CONFIG.phone.replace(/\s+/g,'');
+  });
+}
+
+
+var $panelVeil = document.getElementById('panelVeil');
+var $panelTitle = document.getElementById('panelTitle');
+var $panelSub = document.getElementById('panelSub');
+var $panelTabs = document.getElementById('panelTabs');
+var $panelBody = document.getElementById('panelBody');
+var currentPanel = null;
+
+function openPanel(type, opts){
+  currentPanel = type;
+  $panelVeil.classList.add('show');
+  if(type === 'portfolio') renderPortfolioPanel();
+  else if(type === 'pricing') renderPricingPanel();
+  else if(type === 'reviews') renderReviewPanel();
+  else if(type === 'admin') renderAdminPanel((opts && opts.tab) || 'leads');
+  document.body.style.overflow = 'hidden';
+}
+function closePanel(){
+  $panelVeil.classList.remove('show');
+  document.body.style.overflow = '';
+  currentPanel = null;
+}
+document.getElementById('panelCloseBtn').addEventListener('click', closePanel);
+$panelVeil.addEventListener('click', function(e){ if(e.target === $panelVeil) closePanel(); });
+document.addEventListener('keydown', function(e){
+  if(e.key === 'Escape' && $panelVeil.classList.contains('show')) closePanel();
+});
+
+/* ---- Portfolio panel ---- */
+function renderPortfolioPanel(){
+  $panelTitle.textContent = 'Portfolio';
+  $panelSub.textContent = 'A sample of recent work across industries';
+  $panelTabs.style.display = 'none';
+  var cards = CONFIG.portfolio.map(function(item){
+    return (
+      '<div class="pf-card">' +
+        '<div class="pf-cover">' + ICO.monitor + '<span class="cat">' + escapeHtml(item.cat) + '</span></div>' +
+        '<div class="pf-body">' +
+          '<h4>' + escapeHtml(item.title) + '</h4>' +
+          '<p>' + escapeHtml(item.desc) + '</p>' +
+          '<div class="pf-feat">' + item.feats.map(function(f){ return '<span>' + escapeHtml(f) + '</span>'; }).join('') + '</div>' +
+          '<div class="pf-actions">' +
+            '<button type="button" class="pf-demo">Visit Demo</button>' +
+            '<button type="button" class="primary pf-similar">Request Similar</button>' +
+          '</div>' +
+        '</div>' +
+      '</div>'
+    );
+  }).join('');
+  $panelBody.innerHTML = '<div class="portfolio-grid">' + cards + '</div>';
+  $panelBody.querySelectorAll('.pf-card').forEach(function(card, i){
+    card.querySelector('.pf-demo').addEventListener('click', function(){
+      showToast('Demo preview — ask me and I\'ll share the live link for this project');
+    });
+    card.querySelector('.pf-similar').addEventListener('click', function(){
+      var title = CONFIG.portfolio[i].title;
+      closePanel();
+      handleSend('I\'d like something similar to the "' + title + '" project for my business.');
+    });
+  });
+}
+
+/* ---- Pricing panel ---- */
+function renderPricingPanel(){
+  $panelTitle.textContent = 'Pricing';
+  $panelSub.textContent = 'Transparent tiers — every plan can be tailored';
+  $panelTabs.style.display = 'none';
+  var cards = CONFIG.pricing.map(function(tier){
+    return (
+      '<div class="price-card' + (tier.popular ? ' popular' : '') + '">' +
+        (tier.popular ? '<span class="price-badge">Most popular</span>' : '') +
+        '<h4>' + escapeHtml(tier.name) + '</h4>' +
+        '<div class="price-tag">' + escapeHtml(tier.tag) + '</div>' +
+        '<div class="price-amt">' + escapeHtml(tier.price) + '</div>' +
+        '<ul class="price-feats">' + tier.features.map(function(f){ return '<li>' + ICO.check + escapeHtml(f) + '</li>'; }).join('') + '</ul>' +
+        '<button type="button" class="price-cta" data-tier="' + escapeHtml(tier.name) + '">Choose ' + escapeHtml(tier.name) + '</button>' +
+      '</div>'
+    );
+  }).join('');
+  $panelBody.innerHTML = '<div class="pricing-grid">' + cards + '</div>';
+  $panelBody.querySelectorAll('.price-cta').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var tier = btn.getAttribute('data-tier');
+      closePanel();
+      handleSend("I'm interested in the " + tier + " plan.");
+    });
+  });
+}
+
+/* ---- Google Review demo panel ---- */
+var REVIEW_STEPS = [
+  { ico: ICO.serviceDone, lbl: 'Service Complete' },
+  { ico: ICO.robot, lbl: 'AI Follow Up' },
+  { ico: ICO.smile, lbl: 'Customer Happy' },
+  { ico: ICO.star, lbl: 'Leaves Google Review' },
+  { ico: ICO.trending, lbl: 'Business Growth' }
+];
+function renderReviewPanel(){
+  $panelTitle.textContent = 'Google Review Agent';
+  $panelSub.textContent = 'How automated follow-up turns happy customers into 5-star proof';
+  $panelTabs.style.display = 'none';
+
+  var stepsHtml = REVIEW_STEPS.map(function(s, i){
+    return (
+      '<div class="rf-step" data-i="' + i + '"><div class="ico">' + s.ico + '</div><div class="lbl">' + s.lbl + '</div></div>' +
+      (i < REVIEW_STEPS.length - 1 ? '<svg class="rf-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>' : '')
+    );
+  }).join('');
+
+  $panelBody.innerHTML =
+    '<div class="review-flow" id="reviewFlow">' + stepsHtml + '</div>' +
+    '<div class="review-controls"><button type="button" class="cta-pill" id="playFlowBtn">▶ Play the flow</button></div>' +
+    '<p class="review-note">Try it yourself — tap a star to see how the follow-up message adapts to the customer\'s mood.</p>' +
+    '<div class="review-stars" id="demoStars">' +
+      [1,2,3,4,5].map(function(n){ return '<svg data-n="' + n + '" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.27 5.82 21 7 14.14l-5-4.87 6.91-1.01z"/></svg>'; }).join('') +
+    '</div>' +
+    '<p class="review-note" id="demoNote">Tap a star rating above to preview the automated message.</p>' +
+    '<div class="review-controls"><button type="button" class="cta-pill" id="setupReviewBtn">Set this up for my business</button></div>';
+
+  var steps = $panelBody.querySelectorAll('.rf-step');
+  var playBtn = document.getElementById('playFlowBtn');
+  playBtn.addEventListener('click', function(){
+    steps.forEach(function(s){ s.classList.remove('active'); });
+    playBtn.disabled = true;
+    steps.forEach(function(s, i){
+      setTimeout(function(){
+        s.classList.add('active');
+        if(i === steps.length - 1) playBtn.disabled = false;
+      }, i * 480);
+    });
+  });
+
+  var stars = $panelBody.querySelectorAll('#demoStars svg');
+  var note = document.getElementById('demoNote');
+  var MSGS = {
+    5: "\"That's wonderful to hear! Would you mind sharing a quick Google review? It helps other customers find us.\" → sent automatically via WhatsApp/SMS.",
+    4: "\"So glad you enjoyed it! A short review would mean a lot to our small team.\" → sent automatically, with a direct review link.",
+    3: "\"Thanks for the feedback — would you tell us what would have made it a 5? We'd love a chance to improve.\" → routed privately, no public review requested.",
+    2: "\"We're sorry it wasn't great. A member of our team will reach out personally to make it right.\" → flagged for human follow-up, review request paused.",
+    1: "\"We clearly let you down, and we want to fix it. A manager will contact you directly.\" → flagged urgent, review request paused."
+  };
+  stars.forEach(function(star){
+    star.addEventListener('click', function(){
+      var n = parseInt(star.getAttribute('data-n'), 10);
+      stars.forEach(function(s2){ s2.classList.toggle('lit', parseInt(s2.getAttribute('data-n'),10) <= n); });
+      note.textContent = MSGS[n];
+    });
+  });
+
+  document.getElementById('setupReviewBtn').addEventListener('click', function(){
+    closePanel();
+    handleSend('I\'d like to set up Google Review automation for my business.');
+  });
+}
+
+/* ---- Admin panel: CRM + Analytics (hidden, Ctrl+Shift+L) ---- */
+var adminFilterText = '';
+var adminFilterStatus = '';
+
+function renderAdminPanel(activeTab){
+  $panelTitle.textContent = 'Admin Suite';
+  $panelSub.textContent = 'Internal — leads, scoring and live analytics';
+  $panelTabs.style.display = 'flex';
+  $panelTabs.innerHTML =
+    '<button type="button" class="panel-tab' + (activeTab === 'leads' ? ' active' : '') + '" data-tab="leads">Leads (CRM)</button>' +
+    '<button type="button" class="panel-tab' + (activeTab === 'analytics' ? ' active' : '') + '" data-tab="analytics">Analytics</button>';
+  $panelTabs.querySelectorAll('.panel-tab').forEach(function(tab){
+    tab.addEventListener('click', function(){ renderAdminPanel(tab.getAttribute('data-tab')); });
+  });
+  if(activeTab === 'analytics') renderAnalyticsTab(); else renderLeadsTab();
+}
+
+function leadStarsHtml(score){
+  var out = '<span class="score-stars">';
+  for(var i=1;i<=5;i++){
+    out += i <= score ? ICO.star.replace('<svg ', '<svg class="lit" ') : ICO.star;
+  }
+  return out + '</span>';
+}
+
+function renderLeadsTab(){
+  var leads = loadLeads();
+  var filtered = leads.filter(function(l){
+    var matchesText = !adminFilterText || (l.name + ' ' + l.business + ' ' + l.phone + ' ' + l.email).toLowerCase().indexOf(adminFilterText.toLowerCase()) !== -1;
+    var matchesStatus = !adminFilterStatus || l.status === adminFilterStatus;
+    return matchesText && matchesStatus;
+  });
+
+  var rowsHtml = filtered.length === 0
+    ? '<tr><td colspan="10"><div class="leads-empty">No leads yet — they\'ll appear here as visitors share their details in chat.</div></td></tr>'
+    : filtered.map(function(l){
+        return (
+          '<tr data-id="' + l.id + '">' +
+            '<td>' + escapeHtml(l.name) + '</td>' +
+            '<td>' + escapeHtml(l.business) + '</td>' +
+            '<td>' + escapeHtml(l.phone || '—') + '</td>' +
+            '<td>' + escapeHtml(l.email || '—') + '</td>' +
+            '<td>' + escapeHtml(l.industry) + '</td>' +
+            '<td>' + escapeHtml(l.budget) + '</td>' +
+            '<td>' + leadStarsHtml(l.score) + '</td>' +
+            '<td><select class="status-pill" data-status="' + l.status + '">' +
+              ['new','contacted','qualified','won','lost'].map(function(s){
+                return '<option value="' + s + '"' + (s === l.status ? ' selected' : '') + '>' + s.charAt(0).toUpperCase() + s.slice(1) + '</option>';
+              }).join('') +
+            '</select></td>' +
+            '<td><input type="text" class="notes-input" placeholder="Add note…" value="' + escapeHtml(l.notes || '') + '"></td>' +
+            '<td><button type="button" class="row-del-btn" aria-label="Delete lead">' + ICO.trash + '</button></td>' +
+          '</tr>'
+        );
+      }).join('');
+
+  $panelBody.innerHTML =
+    '<div class="admin-toolbar">' +
+      '<input type="text" id="adminSearch" placeholder="Search leads…" value="' + escapeHtml(adminFilterText) + '">' +
+      '<select id="adminStatusFilter">' +
+        '<option value="">All statuses</option>' +
+        ['new','contacted','qualified','won','lost'].map(function(s){ return '<option value="' + s + '"' + (s===adminFilterStatus?' selected':'') + '>' + s.charAt(0).toUpperCase()+s.slice(1) + '</option>'; }).join('') +
+      '</select>' +
+      '<button type="button" class="ghost" id="exportCsvBtn">Export CSV</button>' +
+    '</div>' +
+    '<div class="leads-table-wrap"><table class="leads-table">' +
+      '<thead><tr><th>Name</th><th>Business</th><th>Phone</th><th>Email</th><th>Industry</th><th>Budget</th><th>Score</th><th>Status</th><th>Notes</th><th></th></tr></thead>' +
+      '<tbody>' + rowsHtml + '</tbody>' +
+    '</table></div>';
+
+  document.getElementById('adminSearch').addEventListener('input', function(e){ adminFilterText = e.target.value; renderLeadsTab(); });
+  document.getElementById('adminStatusFilter').addEventListener('change', function(e){ adminFilterStatus = e.target.value; renderLeadsTab(); });
+  document.getElementById('exportCsvBtn').addEventListener('click', exportLeadsCsv);
+
+  $panelBody.querySelectorAll('tr[data-id]').forEach(function(row){
+    var id = row.getAttribute('data-id');
+    row.querySelector('.status-pill').addEventListener('change', function(e){
+      var list = loadLeads();
+      var lead = list.find(function(l){ return l.id === id; });
+      if(lead){ lead.status = e.target.value; saveLeads(list); }
+    });
+    row.querySelector('.notes-input').addEventListener('change', function(e){
+      var list = loadLeads();
+      var lead = list.find(function(l){ return l.id === id; });
+      if(lead){ lead.notes = e.target.value; saveLeads(list); }
+    });
+    row.querySelector('.row-del-btn').addEventListener('click', function(){
+      var list = loadLeads().filter(function(l){ return l.id !== id; });
+      saveLeads(list);
+      renderLeadsTab();
+      showToast('Lead removed');
+    });
+  });
+}
+
+function exportLeadsCsv(){
+  var leads = loadLeads();
+  if(leads.length === 0){ showToast('No leads to export yet'); return; }
+  var cols = ['name','business','phone','email','industry','budget','timeline','status','score','notes','date'];
+  var rows = [cols.join(',')];
+  leads.forEach(function(l){
+    rows.push(cols.map(function(c){
+      var v = c === 'date' ? new Date(l.date).toLocaleString() : (l[c] !== undefined ? l[c] : '');
+      v = String(v).replace(/"/g,'""');
+      return '"' + v + '"';
+    }).join(','));
+  });
+  var blob = new Blob([rows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = 'ram-executive-ai-leads.csv';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast('CSV exported');
+}
+
+function renderAnalyticsTab(){
+  var leads = loadLeads();
+  var visits = Math.max(getVisitCount(), 1);
+  var totalMsgs = getTotalMessages();
+  var conv = leads.length ? ((leads.length / visits) * 100).toFixed(1) : '0.0';
+
+  $panelBody.innerHTML =
+    '<div class="admin-stats">' +
+      '<div class="stat-card"><div class="num">' + getVisitCount() + '</div><div class="lbl">Visitors</div></div>' +
+      '<div class="stat-card"><div class="num">' + totalMsgs + '</div><div class="lbl">Messages</div></div>' +
+      '<div class="stat-card"><div class="num">' + leads.length + '</div><div class="lbl">Leads</div></div>' +
+      '<div class="stat-card"><div class="num">' + conv + '%</div><div class="lbl">Conversion rate</div></div>' +
+    '</div>' +
+    '<div class="chart-row">' +
+      '<div class="chart-box"><h5>Messages · last 7 days</h5><canvas id="msgChart" width="560" height="170"></canvas></div>' +
+      '<div class="chart-box"><h5>Lead score distribution</h5><canvas id="scoreChart" width="320" height="170"></canvas></div>' +
+    '</div>';
+
+  drawBarChart(document.getElementById('msgChart'), getDailyMessageSeries(7), '#c9a449');
+
+  var dist = [0,0,0,0,0];
+  leads.forEach(function(l){ dist[Math.max(1,Math.min(5,l.score)) - 1]++; });
+  var scoreSeries = dist.map(function(v, i){ return { label: (i+1) + '★', value: v }; });
+  drawBarChart(document.getElementById('scoreChart'), scoreSeries, '#f3d685');
+}
+
+function drawBarChart(canvas, series, color){
+  if(!canvas) return;
+  var ctx = canvas.getContext('2d');
+  var dpr = window.devicePixelRatio || 1;
+  var w = canvas.clientWidth || canvas.width;
+  var h = canvas.height;
+  canvas.width = w * dpr;
+  canvas.height = h * dpr;
+  ctx.scale(dpr, dpr);
+  ctx.clearRect(0,0,w,h);
+
+  var max = Math.max.apply(null, series.map(function(s){ return s.value; }).concat([1]));
+  var padding = 24;
+  var chartH = h - padding;
+  var barGap = 10;
+  var barW = (w - padding) / series.length - barGap;
+
+  ctx.strokeStyle = 'rgba(201,164,73,0.14)';
+  ctx.lineWidth = 1;
+  for(var g=0; g<=2; g++){
+    var gy = chartH - (chartH * g/2);
+    ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(w, gy); ctx.stroke();
+  }
+
+  series.forEach(function(s, i){
+    var x = padding/2 + i * (barW + barGap);
+    var barH = max > 0 ? (s.value / max) * (chartH - 14) : 0;
+    var y = chartH - barH;
+    var grad = ctx.createLinearGradient(0, y, 0, chartH);
+    grad.addColorStop(0, color);
+    grad.addColorStop(1, 'rgba(138,106,47,0.25)');
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    if(ctx.roundRect){ ctx.roundRect(x, y, barW, barH, 4); } else { ctx.rect(x, y, barW, barH); }
+    ctx.fill();
+
+    ctx.fillStyle = '#a8a193';
+    ctx.font = '10.5px Inter, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(s.label, x + barW/2, h - 6);
+
+    if(s.value > 0){
+      ctx.fillStyle = '#f3efe4';
+      ctx.font = '11px Inter, sans-serif';
+      ctx.fillText(String(s.value), x + barW/2, y - 6);
+    }
+  });
+}
+
+document.addEventListener('keydown', function(e){
+  if(e.ctrlKey && e.shiftKey && (e.key === 'L' || e.key === 'l')){
+    e.preventDefault();
+    openPanel('admin', { tab: 'leads' });
+  }
+});
+
+/* =========================================================
+   QUICK ACTIONS + WHATSAPP
+   ========================================================= */
+document.getElementById('quickActions').addEventListener('click', function(e){
+  var btn = e.target.closest('.qa-btn');
+  if(!btn) return;
+  var qa = btn.getAttribute('data-qa');
+  if(qa === 'website') handleSend("I need a website but I'm not sure where to start.");
+  else if(qa === 'chatbot') handleSend('Can you explain how an AI chatbot could help my business?');
+  else if(qa === 'reviews') openPanel('reviews');
+  else if(qa === 'crm') handleSend('Tell me about the CRM and lead capture you offer.');
+  else if(qa === 'pricing') openPanel('pricing');
+  else if(qa === 'portfolio') openPanel('portfolio');
+  else if(qa === 'book') handleSend("I'd like to book a consultation about my project.");
+});
+
+document.getElementById('waFloat').addEventListener('click', function(){
+  var msg = encodeURIComponent('Hello ' + CONFIG.businessName + ', I need a website for my business.');
+  window.open('https://wa.me/' + CONFIG.whatsapp + '?text=' + msg, '_blank', 'noopener');
 });
 
 /* =========================================================
@@ -1165,6 +2222,7 @@ window.addEventListener('resize', function(){
    ========================================================= */
 function init(){
   paintSeals();
+  trackVisit();
   var savedActive = loadActiveId();
   if(state.conversations.length === 0){
     createConversation();
@@ -1177,6 +2235,16 @@ function init(){
   renderHistory('');
   autoGrow();
   if(isMobile()){ $sidebar.classList.add('collapsed'); }
+
+  var glowRaf = null;
+  window.addEventListener('mousemove', function(e){
+    if(glowRaf) return;
+    glowRaf = requestAnimationFrame(function(){
+      document.documentElement.style.setProperty('--mx', e.clientX + 'px');
+      document.documentElement.style.setProperty('--my', e.clientY + 'px');
+      glowRaf = null;
+    });
+  }, { passive: true });
 }
 init();
 
