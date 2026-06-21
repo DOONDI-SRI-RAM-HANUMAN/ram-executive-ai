@@ -769,6 +769,35 @@ table.leads-table tr:hover td{background:rgba(255,255,255,0.02);}
 (function(){
 "use strict";
 
+
+/* =========================================================
+   BUSINESS KNOWLEDGE BASE
+   Update only this object and the AI will use latest data.
+   ========================================================= */
+var KNOWLEDGE_BASE = {
+  pricing:{
+    basic:{name:"Basic Static Website",price:"₹3000",maintenance:"₹300/month"},
+    premium:{name:"Premium Static Website",price:"₹5000",maintenance:"₹500/month"}
+  },
+  services:[
+    "Static Website",
+    "WhatsApp Integration",
+    "Google Review Automation",
+    "AI Chatbot",
+    "Landing Page"
+  ],
+  faq:[
+    {
+      q:"What is the price?",
+      a:"Basic Static Website ₹3000 + ₹300/month maintenance. Premium Static Website ₹5000 + ₹500/month maintenance."
+    },
+    {
+      q:"Do you provide hosting?",
+      a:"Yes, hosting and maintenance are available."
+    }
+  ]
+};
+
 /* =========================================================
    CONFIG — single source of truth for the whole application.
    Edit these values to rebrand or update offerings; every
